@@ -362,13 +362,14 @@ window.aiteko = function($) {
 
 					//var ElInitCheck = $(window).data("events") && $(window).data("events")['elementor/frontend/init'];
 					//console.log( ElInitCheck );
+					
 					window.setTimeout(function(){
 						/** version 1.1.9 - (tested on Elementor 2.5.5)
 						  * need to remove the trigger,
 						  * causing some modules forced to active when hooks are not ready yet!
 						  */
-						//elementorFrontend.hooks.doAction( 'init' );
-						//window.elementorFrontend.init();
+						//t.$win.trigger( 'elementor/frontend/init' );
+						window.elementorFrontend.init();
 					},5);
 				}
 
@@ -478,7 +479,7 @@ window.aiteko = function($) {
 
 					$('script[type="text/javascript"]').each(function() {
 						var js__src = ( typeof $(this).attr('src') !== 'undefined' ? $(this).attr('src') : '' );
-						if ( js__src.indexOf('/js/jquery/jquery.js') == -1 && js__src.indexOf('/js/jquery/jquery-migrate.min.js') == -1 && js__src.indexOf('/aiteko/assets/js/anime.min.js') == -1 && js__src.indexOf('/aiteko/assets/js/global.js') == -1 && js__src.indexOf('pace.min.js') == -1 && js__src.indexOf('slick.min.js') == -1 ) {
+						if ( js__src.indexOf('/js/jquery/jquery.js') == -1 && js__src.indexOf('/js/jquery/jquery-migrate.min.js') == -1 && js__src.indexOf('/aiteko/assets/js/anime.min.js') == -1 && js__src.indexOf('/aiteko/assets/js/global.js') == -1 && js__src.indexOf('pace.min.js') == -1 && js__src.indexOf('slick.min.js') == -1 && js__src.indexOf('elementor/assets/js/frontend.min.js') == -1 ) {
 							$(this).remove();
 						}
 					});
@@ -491,18 +492,18 @@ window.aiteko = function($) {
 									$('#aiteko-mo-script').append( $(x) );
 								}
 							} else {
-								if ( $('script[src="'+_js[_jsid]+'"]').length < 1 ) {
-									if ( _js[_jsid].includes('elementor/assets/js/frontend.min.js') === true ||  _js[_jsid].includes('elementor-pro/assets/js/frontend.min.js') === true ) {
-										elementorFrontendDetected = true;
+								if ( _js[_jsid].includes('elementor/assets/js/frontend.min.js') === true ||  _js[_jsid].includes('elementor-pro/assets/js/frontend.min.js') === true ) {
+									elementorFrontendDetected = true;
 
-										if ( typeof elementorProFrontend !== 'undefined' ) {	
-											for(var key in elementorProFrontend) {
-												delete elementorProFrontend[key];
-											}
-
-											delete window.elementorProFrontend;
+									if ( typeof elementorProFrontend !== 'undefined' ) {	
+										for(var key in elementorProFrontend) {
+											delete elementorProFrontend[key];
 										}
+
+										delete window.elementorProFrontend;
 									}
+								}
+								if ( $('script[src="'+_js[_jsid]+'"]').length < 1 ) {
 									$.cachedScript( _js[_jsid] );
 								}
 							}
@@ -511,10 +512,10 @@ window.aiteko = function($) {
 				}
 
 				if ( elementorFrontendDetected ) {
-					//jQuery(window).off('elementor/frontend/init');
 					if ( $(window).data("events") && $(window).data("events")['elementor/frontend/init'] ) {
-						$(window).data("events")['elementor/frontend/init'] = {};
+						$(window).data("events")['elementor/frontend/init'] = [];
 					}
+					jQuery(window).off('elementor/frontend/init');
 				}
 
 				window.setTimeout(function() {
@@ -643,7 +644,12 @@ window.aiteko = function($) {
 			$('body').css({cursor: 'progress', pointerEvents: 'none'});
 
 			t.preChangePage(cT);
-			
+
+			//if ( $(window).data("events") && $(window).data("events")['elementor/frontend/init'] ) {
+				//$(window).data("events")['elementor/frontend/init'] = [];
+			//}
+			jQuery(window).off('elementor/frontend/init');
+
 			$.ajax({
 				url : dest_url,
 				type: 'GET',
@@ -839,7 +845,7 @@ window.aiteko = function($) {
 
 			if( typeof scripts !== 'undefined' ) {
 				var scriptDiv = $("<div id='aiteko-mo-script' />");
-				
+
 				if ( $('#aiteko-mo-script').length < 1 ) {
 					$('body').append($(scriptDiv));
 					$('#aiteko-mo-script').css({width:0,height:0,overflow:'hidden'});
@@ -849,7 +855,7 @@ window.aiteko = function($) {
 
 				$('script[type="text/javascript"]').each(function() {
 					var js__src = ( typeof $(this).attr('src') !== 'undefined' ? $(this).attr('src') : '' );
-					if ( js__src.includes('/js/jquery/jquery.js') === false && js__src.includes('/js/jquery/jquery-migrate.min.js') === false &&  js__src.includes('/aiteko/assets/js/anime.min.js') === false &&  js__src.includes('/aiteko/assets/js/global.js') === false && js__src.includes('pace.min.js') === false && js__src.includes('slick.min.js') === false ) {
+					if ( js__src.includes('/js/jquery/jquery.js') === false && js__src.includes('/js/jquery/jquery-migrate.min.js') === false &&  js__src.includes('/aiteko/assets/js/anime.min.js') === false &&  js__src.includes('/aiteko/assets/js/global.js') === false && js__src.includes('pace.min.js') === false && js__src.includes('slick.min.js') === false && js__src.includes('elementor/assets/js/frontend.min.js') === false ) {
 						$(this).remove();
 					}
 				});
@@ -888,7 +894,6 @@ window.aiteko = function($) {
 
 										delete window.elementorProFrontend;
 									}
-									//jQuery(window).off('elementor/frontend/init');
 									$.cachedScript( scripts[_jsid] );
 								} else {
 									$.cachedScript( scripts[_jsid] );
@@ -899,10 +904,7 @@ window.aiteko = function($) {
 				}
 
 				if ( elementorFrontendDetected ) {
-					//jQuery(window).off('elementor/frontend/init');
-					if ( $(window).data("events") && $(window).data("events")['elementor/frontend/init'] ) {
-						$(window).data("events")['elementor/frontend/init'] = {};
-					}
+					jQuery(window).off('elementor/frontend/init');
 				}
 				/** Version 1.1.6 - globalEval causing Elementor addon confused LOL, remove this! */
 				//else {
@@ -1441,8 +1443,8 @@ window.aiteko = function($) {
 		},
 		initAnim: function() {
 			var t=this, b=$('body'), section;
-
-			if ( b.hasClass('single-post') || b.hasClass('single-attachment') ) {
+			
+			/**if ( b.hasClass('single-post') || b.hasClass('single-attachment') ) {
 				section = 'single-blog';
 			} else if ( b.hasClass('single-portfolio') ) {
 				section = 'single-portfolio';
@@ -1458,6 +1460,26 @@ window.aiteko = function($) {
 				section = 'errorPage';
 			} else if ( b.hasClass('search-results') || b.hasClass('search-no-results') ) {
 				section = 'search-results';
+			}*/
+
+			if ( b.hasClass('page') || b.hasClass('single-elementor_library') ) {
+				section = 'page';
+			} else if ( b.hasClass('single-post') || b.hasClass('single-attachment') ) {
+				section = 'single-blog';
+			} else if ( b.hasClass('search-results') || b.hasClass('search-no-results') ) {
+				section = 'search-results';
+			} else if ( b.hasClass('single-portfolio') ) {
+				section = 'single-portfolio';
+			} else if ( b.hasClass('error404') ) {
+				section = 'errorPage';
+			} else {
+				if ( $('.post-grids').length ) {
+					section = 'blog-archive';
+				} else if ( $('.portfolio-default').length ) {
+					section = 'portfolio-default';
+				} else if ( $('.portfolio-grid').length ) {
+					section = 'portfolio-grid';
+				}
 			}
 
 			if ( typeof section !== 'undefined' ) {
